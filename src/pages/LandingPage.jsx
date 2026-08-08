@@ -986,13 +986,13 @@ function KontakSection() {
             </div>
             <div className="flex gap-3">
               {kontak.instagram && (
-                <a href={`https://instagram.com/${kontak.instagram}`} target="_blank" rel="noopener noreferrer"
+                <a href={kontak.instagram.startsWith('http') ? kontak.instagram : `https://instagram.com/${kontak.instagram}`} target="_blank" rel="noopener noreferrer"
                   className="card p-4 flex-1 flex items-center justify-center gap-2 text-sm font-medium text-pink-600 hover:bg-pink-50">
                   <Instagram size={20} /> Instagram
                 </a>
               )}
               {kontak.facebook && (
-                <a href={`https://facebook.com/${kontak.facebook}`} target="_blank" rel="noopener noreferrer"
+                <a href={kontak.facebook.startsWith('http') ? kontak.facebook : `https://facebook.com/${kontak.facebook}`} target="_blank" rel="noopener noreferrer"
                   className="card p-4 flex-1 flex items-center justify-center gap-2 text-sm font-medium text-blue-600 hover:bg-blue-50">
                   <Facebook size={20} /> Facebook
                 </a>
@@ -1001,14 +1001,14 @@ function KontakSection() {
           </div>
 
           <div className="card overflow-hidden h-80 lg:h-auto">
-            <div className="w-full h-full bg-gradient-to-br from-almarwa-100 to-almarwa-200 flex items-center justify-center">
+            <a href={kontak.maps_url || '#'} target="_blank" rel="noopener noreferrer" className="w-full h-full bg-gradient-to-br from-almarwa-100 to-almarwa-200 flex items-center justify-center hover:opacity-90 transition-opacity block">
               <div className="text-center p-6">
                 <MapPin size={48} className="text-almarwa-400 mx-auto mb-3" />
                 <p className="text-almarwa-600 font-semibold">Lokasi Kantor</p>
                 <p className="text-sm text-almarwa-400 mt-1">Almarwa Tour & Travel</p>
                 <p className="text-xs text-almarwa-300 mt-2">{kontak.alamat}</p>
               </div>
-            </div>
+            </a>
           </div>
         </div>
       </div>
