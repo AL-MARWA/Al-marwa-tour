@@ -981,7 +981,9 @@ function KontakSection() {
               <div className="stat-icon bg-red-100"><MapPin className="text-red-500" size={22} /></div>
               <div>
                 <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">Alamat</p>
-                <p className="font-medium text-sm text-gray-700">{kontak.alamat}</p>
+                <a href="https://maps.app.goo.gl/6f5MBUBYvJBr5wB57?g_st=ic" target="_blank" rel="noopener noreferrer" className="font-medium text-sm text-gray-700 hover:text-almarwa-600 block transition-colors">
+                  {kontak.alamat}
+                </a>
               </div>
             </div>
             <div className="flex gap-3">
@@ -1017,7 +1019,7 @@ function KontakSection() {
 }
 
 // ===== Footer =====
-function Footer() {
+function Footer({ kontak = {} }) {
   return (
     <footer className="bg-gradient-to-br from-almarwa-900 via-almarwa-800 to-almarwa-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -1055,9 +1057,22 @@ function Footer() {
           <div>
             <h4 className="font-bold text-sm uppercase tracking-wider mb-4 text-white/80">Kontak</h4>
             <div className="space-y-3 text-sm text-white/50">
-              <div className="flex items-center gap-2"><Phone size={14} /> +62 812-3456-7890</div>
-              <div className="flex items-center gap-2"><Mail size={14} /> info@almarwatour.com</div>
-              <div className="flex items-start gap-2"><MapPin size={14} className="mt-0.5 shrink-0" /> Jl. KH. Ahmad Dahlan No. 123, Jakarta Selatan</div>
+              <div className="flex items-center gap-2">
+                <Phone size={14} /> 
+                <a href={`https://wa.me/${kontak.whatsapp}`} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                  +{kontak.whatsapp}
+                </a>
+              </div>
+              <div className="flex items-center gap-2">
+                <Mail size={14} /> 
+                <a href={`mailto:${kontak.email}`} className="hover:text-white transition-colors">{kontak.email}</a>
+              </div>
+              <div className="flex items-start gap-2">
+                <MapPin size={14} className="mt-0.5 shrink-0" /> 
+                <a href="https://maps.app.goo.gl/6f5MBUBYvJBr5wB57?g_st=ic" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors text-left block">
+                  {kontak.alamat}
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -1116,7 +1131,7 @@ export default function LandingPage() {
       <FAQSection />
       <CTASection />
       <KontakSection />
-      <Footer />
+      <Footer kontak={kontak} />
     </div>
   );
 }
