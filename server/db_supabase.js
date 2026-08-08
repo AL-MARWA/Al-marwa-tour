@@ -104,6 +104,32 @@ class SupabaseDBAdapter {
       return null;
     }
   }
+
+  async uploadFile(bucket, filePath, fileBuffer, mimeType) {
+    if (!this.client) return null;
+    try {
+      const { data, error } = await this.client.storage
+        .from(bucket)
+        .upload(filePath, fileBuffer, {
+          contentType: mimeType,
+          upsert: true
+        });
+      
+      if (error) {
+        console.error('Supabase upload error:', error.message);
+        throw new Error(error.message);
+      }
+      
+      const { data: publicUrlData } = this.client.storage
+        .from(bucket)
+        .getPublicUrl(filePath);
+        
+      return publicUrlData.publicUrl;
+    } catch (e) {
+      console.error('Supabase upload Exception:', e.message);
+      throw e;
+    }
+  }
 }
 
 export default new SupabaseDBAdapter();
