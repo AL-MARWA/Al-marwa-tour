@@ -944,7 +944,11 @@ function FAQSection() {
 }
 
 // ===== Kontak Section =====
-function KontakSection({ kontak = {} }) {
+function KontakSection() {
+  const [kontak, setKontak] = useState({});
+  useEffect(() => {
+    apiFetch('/public/kontak').then(setKontak).catch(() => {});
+  }, []);
 
   return (
     <section id="kontak" className="py-20 bg-white">
@@ -977,9 +981,7 @@ function KontakSection({ kontak = {} }) {
               <div className="stat-icon bg-red-100"><MapPin className="text-red-500" size={22} /></div>
               <div>
                 <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">Alamat</p>
-                <a href="https://maps.app.goo.gl/6f5MBUBYvJBr5wB57?g_st=ic" target="_blank" rel="noopener noreferrer" className="font-medium text-sm text-gray-700 hover:text-almarwa-600 block transition-colors">
-                  {kontak.alamat}
-                </a>
+                <p className="font-medium text-sm text-gray-700">{kontak.alamat}</p>
               </div>
             </div>
             <div className="flex gap-3">
@@ -1015,7 +1017,7 @@ function KontakSection({ kontak = {} }) {
 }
 
 // ===== Footer =====
-function Footer({ kontak = {} }) {
+function Footer() {
   return (
     <footer className="bg-gradient-to-br from-almarwa-900 via-almarwa-800 to-almarwa-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -1053,22 +1055,9 @@ function Footer({ kontak = {} }) {
           <div>
             <h4 className="font-bold text-sm uppercase tracking-wider mb-4 text-white/80">Kontak</h4>
             <div className="space-y-3 text-sm text-white/50">
-              <div className="flex items-center gap-2">
-                <Phone size={14} /> 
-                <a href={`https://wa.me/${kontak.whatsapp}`} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
-                  +{kontak.whatsapp}
-                </a>
-              </div>
-              <div className="flex items-center gap-2">
-                <Mail size={14} /> 
-                <a href={`mailto:${kontak.email}`} className="hover:text-white transition-colors">{kontak.email}</a>
-              </div>
-              <div className="flex items-start gap-2">
-                <MapPin size={14} className="mt-0.5 shrink-0" /> 
-                <a href="https://maps.app.goo.gl/6f5MBUBYvJBr5wB57?g_st=ic" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors text-left block">
-                  {kontak.alamat}
-                </a>
-              </div>
+              <div className="flex items-center gap-2"><Phone size={14} /> +62 812-3456-7890</div>
+              <div className="flex items-center gap-2"><Mail size={14} /> info@almarwatour.com</div>
+              <div className="flex items-start gap-2"><MapPin size={14} className="mt-0.5 shrink-0" /> Jl. KH. Ahmad Dahlan No. 123, Jakarta Selatan</div>
             </div>
           </div>
         </div>
@@ -1086,14 +1075,14 @@ function Footer({ kontak = {} }) {
 }
 
 // ===== CTA Section =====
-function CTASection({ kontak = {} }) {
+function CTASection() {
   const { navigate, user } = useAuth();
   return (
     <section className="py-20 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-almarwa-700 to-almarwa-600"></div>
       <div className="absolute inset-0 bg-pattern-islamic opacity-10"></div>
       <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
-      
+
       <div className="relative max-w-4xl mx-auto px-4 text-center">
         <p className="font-arabic text-lg text-yellow-300/80 mb-4">وَأَتِمُّوا الْحَجَّ وَالْعُمْرَةَ لِلَّهِ</p>
         <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">Siap Memulai Perjalanan Suci Anda?</h2>
@@ -1102,7 +1091,7 @@ function CTASection({ kontak = {} }) {
           <button onClick={() => navigate(user ? 'jamaah' : 'register')} className="btn-gold flex items-center gap-2 text-base">
             Daftar Sekarang <ArrowRight size={18} />
           </button>
-          <a href={`https://wa.me/${kontak.whatsapp}`} target="_blank" rel="noopener noreferrer"
+          <a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer"
             className="btn-secondary !border-white/30 !text-white hover:!bg-white hover:!text-almarwa-700 flex items-center gap-2 text-base">
             <MessageCircle size={18} /> Hubungi via WhatsApp
           </a>
@@ -1114,11 +1103,6 @@ function CTASection({ kontak = {} }) {
 
 // ===== Landing Page =====
 export default function LandingPage() {
-  const [kontak, setKontak] = useState({});
-  useEffect(() => {
-    apiFetch('/public/kontak').then(setKontak).catch(() => {});
-  }, []);
-
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -1130,9 +1114,9 @@ export default function LandingPage() {
       <GaleriSection />
       <TestimoniSection />
       <FAQSection />
-      <CTASection kontak={kontak} />
-      <KontakSection kontak={kontak} />
-      <Footer kontak={kontak} />
+      <CTASection />
+      <KontakSection />
+      <Footer />
     </div>
   );
 }
