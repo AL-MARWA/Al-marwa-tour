@@ -1000,15 +1000,15 @@ function KontakSection() {
             </div>
           </div>
 
-          <div className="card overflow-hidden h-80 lg:h-auto">
-            <a href={kontak.maps_url || '#'} target="_blank" rel="noopener noreferrer" className="w-full h-full bg-gradient-to-br from-almarwa-100 to-almarwa-200 flex items-center justify-center hover:opacity-90 transition-opacity block">
-              <div className="text-center p-6">
-                <MapPin size={48} className="text-almarwa-400 mx-auto mb-3" />
-                <p className="text-almarwa-600 font-semibold">Lokasi Kantor</p>
-                <p className="text-sm text-almarwa-400 mt-1">Almarwa Tour & Travel</p>
-                <p className="text-xs text-almarwa-300 mt-2">{kontak.alamat}</p>
-              </div>
-            </a>
+          <div className="card overflow-hidden h-80 lg:h-full min-h-[320px]">
+            <iframe 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3944.6387866534924!2d116.34563369999998!3d-8.6306323!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dcdb51ef122a593%3A0x4144a4852454998c!2sAL%20MARWA%20TOUR%20%26%20TRAVEL!5e0!3m2!1sen!2sid!4v1786180906473!5m2!1sen!2sid" 
+              className="w-full h-full" 
+              style={{ border: 0 }} 
+              allowFullScreen 
+              loading="lazy" 
+              referrerPolicy="strict-origin-when-cross-origin"
+            ></iframe>
           </div>
         </div>
       </div>
