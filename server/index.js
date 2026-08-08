@@ -33,13 +33,7 @@ if (!existsSync(uploadsDir)) mkdirSync(uploadsDir, { recursive: true });
 app.use('/uploads', express.static(uploadsDir));
 
 // Multer upload config
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + extname(file.originalname));
-  }
-});
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
@@ -356,19 +350,24 @@ app.post('/api/jamaah/dokumen', authMiddleware, roleMiddleware('jamaah'), upload
       return res.status(403).json({ error: 'Akses ditolak.' });
     }
 
+    // Upload to Supabase Storage
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const fileName = `dokumen/${pendaftaran_id}/${uniqueSuffix}${extname(req.file.originalname)}`;
+    const publicUrl = await supabaseAdapter.uploadFile('uploads', fileName, req.file.buffer, req.file.mimetype);
+
     // Check if doc already exists, update it
     const existingRaw = await db.getWhere('dokumen_jamaah', { pendaftaran_id: parseInt(pendaftaran_id), jenis });
     const existing = Array.isArray(existingRaw) ? existingRaw : [];
     if (existing.length > 0) {
       await db.update('dokumen_jamaah', existing[0].id, {
-        file_path: '/uploads/' + req.file.filename,
+        file_path: publicUrl,
         status: 'Belum Diperiksa'
       });
     } else {
       await db.insert('dokumen_jamaah', {
         pendaftaran_id: parseInt(pendaftaran_id),
         jenis,
-        file_path: '/uploads/' + req.file.filename,
+        file_path: publicUrl,
         status: 'Belum Diperiksa',
         catatan: null
       });
@@ -397,12 +396,19 @@ app.post('/api/jamaah/pembayaran', authMiddleware, roleMiddleware('jamaah'), upl
       return res.status(403).json({ error: 'Akses ditolak.' });
     }
 
+    let publicUrl = null;
+    if (req.file) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const fileName = `pembayaran/${pendaftaran_id}/${uniqueSuffix}${extname(req.file.originalname)}`;
+      publicUrl = await supabaseAdapter.uploadFile('uploads', fileName, req.file.buffer, req.file.mimetype);
+    }
+
     const pembayaran = await db.insert('pembayaran', {
       pendaftaran_id: parseInt(pendaftaran_id),
       jenis,
       jumlah: parseInt(jumlah),
       tanggal: new Date().toISOString().split('T')[0],
-      bukti: req.file ? '/uploads/' + req.file.filename : null,
+      bukti: publicUrl,
       status: 'Menunggu Verifikasi',
       catatan: catatan || null
     });
@@ -782,7 +788,9 @@ app.post('/api/admin/galeri', authMiddleware, roleMiddleware('admin'), upload.si
     const { judul, deskripsi, tipe, url } = req.body;
     let fotoUrl = url || '';
     if (req.file) {
-      fotoUrl = '/uploads/' + req.file.filename;
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const fileName = `galeri/${uniqueSuffix}${extname(req.file.originalname)}`;
+      fotoUrl = await supabaseAdapter.uploadFile('uploads', fileName, req.file.buffer, req.file.mimetype);
     }
     if (!judul || (!fotoUrl && !req.file)) {
       return res.status(400).json({ error: 'Judul/caption dan foto (file atau URL) wajib diisi.' });
@@ -809,7 +817,9 @@ app.put('/api/admin/galeri/:id', authMiddleware, roleMiddleware('admin'), upload
 
     let fotoUrl = existing.url;
     if (req.file) {
-      fotoUrl = '/uploads/' + req.file.filename;
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const fileName = `galeri/${uniqueSuffix}${extname(req.file.originalname)}`;
+      fotoUrl = await supabaseAdapter.uploadFile('uploads', fileName, req.file.buffer, req.file.mimetype);
     } else if (url !== undefined && url !== '') {
       fotoUrl = url;
     }
@@ -911,20 +921,22 @@ app.get('*', (req, res) => {
 // =====================================================
 // START SERVER
 // =====================================================
-app.listen(PORT, () => {
-  console.log('');
-  console.log('╔═══════════════════════════════════════════════════╗');
-  console.log('║    🕋  ALMARWA TOUR & TRAVEL - API Server  🕋     ║');
-  console.log('║       Umroh & Haji Plus - Melayani Sepenuh Hati   ║');
-  console.log('╠═══════════════════════════════════════════════════╣');
-  console.log(`║    Server running on http://localhost:${PORT}        ║`);
-  console.log('║                                                   ║');
-  console.log('║    Demo Accounts:                                 ║');
-  console.log('║    Admin:  admin@almarwa.com / admin123           ║');
-  console.log('║    Owner:  owner@almarwa.com / owner123           ║');
-  console.log('║    Jamaah: jamaah@almarwa.com / jamaah123         ║');
-  console.log('╚═══════════════════════════════════════════════════╝');
-  console.log('');
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log('');
+    console.log('╔═══════════════════════════════════════════════════╗');
+    console.log('║    🕋  ALMARWA TOUR & TRAVEL - API Server  🕋     ║');
+    console.log('║       Umroh & Haji Plus - Melayani Sepenuh Hati   ║');
+    console.log('╠═══════════════════════════════════════════════════╣');
+    console.log(`║    Server running on http://localhost:${PORT}        ║`);
+    console.log('║                                                   ║');
+    console.log('║    Demo Accounts:                                 ║');
+    console.log('║    Admin:  admin@almarwa.com / admin123           ║');
+    console.log('║    Owner:  owner@almarwa.com / owner123           ║');
+    console.log('║    Jamaah: jamaah@almarwa.com / jamaah123         ║');
+    console.log('╚═══════════════════════════════════════════════════╝');
+    console.log('');
+  });
+}
 
 export default app;
