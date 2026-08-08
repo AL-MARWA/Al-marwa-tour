@@ -944,11 +944,7 @@ function FAQSection() {
 }
 
 // ===== Kontak Section =====
-function KontakSection() {
-  const [kontak, setKontak] = useState({});
-  useEffect(() => {
-    apiFetch('/public/kontak').then(setKontak).catch(() => {});
-  }, []);
+function KontakSection({ kontak = {} }) {
 
   return (
     <section id="kontak" className="py-20 bg-white">
@@ -1090,14 +1086,14 @@ function Footer({ kontak = {} }) {
 }
 
 // ===== CTA Section =====
-function CTASection() {
+function CTASection({ kontak = {} }) {
   const { navigate, user } = useAuth();
   return (
     <section className="py-20 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-almarwa-700 to-almarwa-600"></div>
       <div className="absolute inset-0 bg-pattern-islamic opacity-10"></div>
       <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
-
+      
       <div className="relative max-w-4xl mx-auto px-4 text-center">
         <p className="font-arabic text-lg text-yellow-300/80 mb-4">وَأَتِمُّوا الْحَجَّ وَالْعُمْرَةَ لِلَّهِ</p>
         <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">Siap Memulai Perjalanan Suci Anda?</h2>
@@ -1106,7 +1102,7 @@ function CTASection() {
           <button onClick={() => navigate(user ? 'jamaah' : 'register')} className="btn-gold flex items-center gap-2 text-base">
             Daftar Sekarang <ArrowRight size={18} />
           </button>
-          <a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer"
+          <a href={`https://wa.me/${kontak.whatsapp}`} target="_blank" rel="noopener noreferrer"
             className="btn-secondary !border-white/30 !text-white hover:!bg-white hover:!text-almarwa-700 flex items-center gap-2 text-base">
             <MessageCircle size={18} /> Hubungi via WhatsApp
           </a>
@@ -1118,6 +1114,11 @@ function CTASection() {
 
 // ===== Landing Page =====
 export default function LandingPage() {
+  const [kontak, setKontak] = useState({});
+  useEffect(() => {
+    apiFetch('/public/kontak').then(setKontak).catch(() => {});
+  }, []);
+
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -1129,8 +1130,8 @@ export default function LandingPage() {
       <GaleriSection />
       <TestimoniSection />
       <FAQSection />
-      <CTASection />
-      <KontakSection />
+      <CTASection kontak={kontak} />
+      <KontakSection kontak={kontak} />
       <Footer kontak={kontak} />
     </div>
   );
